@@ -29,7 +29,7 @@ package java.lang;
  * Class {@code Object} is the root of the class hierarchy.
  * Every class has {@code Object} as a superclass. All objects,
  * including arrays, implement the methods of this class.
- *
+ *Object类是所有类的超类，是所有类继承的根类，所有对象包括数组实现了其方法
  * @author  unascribed
  * @see     java.lang.Class
  * @since   JDK1.0
