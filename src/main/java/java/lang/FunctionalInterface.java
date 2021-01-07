@@ -28,20 +28,22 @@ package java.lang;
 import java.lang.annotation.*;
 
 /**
- * An informative annotation type used to indicate(标明) that an interface
- * type declaration(声明) is intended to be(打算成为) a <i>functional interface</i> as
- * defined by the Java Language Specification(说明书).
- *
- * Conceptually(概念上来说), a functional interface(函数接口) has exactly(正确的) one abstract
+ * An informative annotation type used to indicate that an interface
+ * type declaration is intended to be a <i>functional interface</i> as
+ * defined by the Java Language Specification.
+ * 从概念上来说，一个函数式接口的确只能有一个抽象方法
+ * 接口中的静态方法和默认方法都不算抽象方法
+ * 因为接口类都默认继承了Object类，所以接口中声明的抽象方法重写的是Object中的方法，不计入当前接口的抽象方法中
+ * Conceptually, a functional interface has exactly one abstract
  * method.  Since {@linkplain java.lang.reflect.Method#isDefault()
  * default methods} have an implementation, they are not abstract.  If
- * an interface declares(声明) an abstract method overriding one of the
+ * an interface declares an abstract method overriding one of the
  * public methods of {@code java.lang.Object}, that also does
- * <em>not</em> count toward(朝着，接近) the interface's abstract method count
+ * <em>not</em> count toward the interface's abstract method count
  * since any implementation of the interface will have an
  * implementation from {@code java.lang.Object} or elsewhere.
  *
- * <p>Note that instances(实例) of functional interfaces can be created with
+ * <p>Note that instances of functional interfaces can be created with
  * lambda expressions, method references, or constructor references.
  *
  * <p>If a type is annotated with this annotation type, compilers are
@@ -51,10 +53,10 @@ import java.lang.annotation.*;
  * <li> The type is an interface type and not an annotation type, enum, or class.
  * <li> The annotated type satisfies the requirements of a functional interface.
  * </ul>
- *
- * <p>However, the compiler will treat(对待) any interface meeting the
+ * 编译器会把所有满足函数式接口定义的接口当作函数式接口，而不管他有没有加FunctionalInterface注解
+ * <p>However, the compiler will treat any interface meeting the
  * definition of a functional interface as a functional interface
- * regardless of whether or not(无论是否) a {@code FunctionalInterface}
+ * regardless of whether or not a {@code FunctionalInterface}
  * annotation is present on the interface declaration.
  *
  * @jls 4.3.2. The Class Object

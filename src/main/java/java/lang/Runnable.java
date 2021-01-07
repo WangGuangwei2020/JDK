@@ -29,7 +29,7 @@ package java.lang;
  *
  * 现象：任何 class 只要实现了 Runnable，就能被线程执行。
  * 定义了一个通用的标准，只要想被运行，就实现它。
- * 可以在不开子线程的情况下运行
+ * 可以在不开子线程的情况下运行，因为有时候实现Runnable接口只是想运行他的run方法，除非是真的想增强这个类的基建能力
  *
  * The <code>Runnable</code> interface should be implemented by any
  * class whose instances are intended to be executed by a thread. The
@@ -60,6 +60,7 @@ package java.lang;
 @FunctionalInterface
 public interface Runnable {
     /**
+     * 一个实现了Runnable接口的Object类去创建一个线程，开启线程会在单独的线程执行run方法
      * When an object implementing interface <code>Runnable</code> is used
      * to create a thread, starting the thread causes the object's
      * <code>run</code> method to be called in that separately executing
