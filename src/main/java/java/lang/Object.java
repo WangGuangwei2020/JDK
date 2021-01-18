@@ -29,23 +29,29 @@ package java.lang;
  * Class {@code Object} is the root of the class hierarchy.
  * Every class has {@code Object} as a superclass. All objects,
  * including arrays, implement the methods of this class.
- *Object类是所有类的超类，是所有类继承的根类，所有对象包括数组实现了其方法
+ * Object类是所有类的超类，是所有类继承的根类，所有对象包括数组实现了其方法
  * @author  unascribed
  * @see     java.lang.Class
  * @since   JDK1.0
  */
 public class Object {
 
+    /**
+     * 下面代码的功能就是先定义了registerNatives()方法，然后当该类被加载的时候，
+     * 调用该方法完成对该类中本地方法的注册,注册的方法就是该类所包含的除了registerNatives()方法以外的所有本地方法
+     */
     private static native void registerNatives();
     static {
         registerNatives();
     }
 
     /**
+     * 返回这个运行时字节码对象
+     * 返回被表示类的静态同步方法锁定的对象
      * Returns the runtime class of this {@code Object}. The returned
      * {@code Class} object is the object that is locked by {@code
      * static synchronized} methods of the represented class.
-     *
+     * 调用getClass()方法实际的返回类型是Class<? extends |X|>，而|X|是被擦除的静态类型表达式
      * <p><b>The actual result type is {@code Class<? extends |X|>}
      * where {@code |X|} is the erasure of the static type of the
      * expression on which {@code getClass} is called.</b> For
@@ -63,21 +69,26 @@ public class Object {
     public final native Class<?> getClass();
 
     /**
+     * 返回一个对象的hashCode，对于散列表结构(比如HashMap)的对象是有好处的
      * Returns a hash code value for the object. This method is
      * supported for the benefit of hash tables such as those provided by
      * {@link java.util.HashMap}.
      * <p>
      * The general contract of {@code hashCode} is:
      * <ul>
+     *     如果对象没有被修改，多次调用hashCode方法返回值应该是一样的
      * <li>Whenever it is invoked on the same object more than once during
      *     an execution of a Java application, the {@code hashCode} method
      *     must consistently return the same integer, provided no information
      *     used in {@code equals} comparisons on the object is modified.
      *     This integer need not remain consistent from one execution of an
      *     application to another execution of the same application.
+     *     equals方法比较相等的对象，hashCode也必须相等
      * <li>If two objects are equal according to the {@code equals(Object)}
      *     method, then calling the {@code hashCode} method on each of
      *     the two objects must produce the same integer result.
+     *     并不强制要求equals方法比较不相等的对象，hashCode也不等，
+     *     但是不相等的对象使用不同的hashCode有助于提高哈希表效率
      * <li>It is <em>not</em> required that if two objects are unequal
      *     according to the {@link java.lang.Object#equals(java.lang.Object)}
      *     method, then calling the {@code hashCode} method on each of the
@@ -86,6 +97,8 @@ public class Object {
      *     for unequal objects may improve the performance of hash tables.
      * </ul>
      * <p>
+     *  hashCode默认是由对象地址转换而来的，根据不同对象转化成不同hash值，
+     *  但是这种实现并不是Java语言要求的，所以我们常常重写它
      * As much as is reasonably practical, the hashCode method defined by
      * class {@code Object} does return distinct integers for distinct
      * objects. (This is typically implemented by converting the internal
@@ -100,6 +113,7 @@ public class Object {
     public native int hashCode();
 
     /**
+     * 判断对象是否与指定对象相等
      * Indicates whether some other object is "equal to" this one.
      * <p>
      * The {@code equals} method implements an equivalence relation
@@ -107,26 +121,27 @@ public class Object {
      * <ul>
      * <li>It is <i>reflexive</i>: for any non-null reference value
      *     {@code x}, {@code x.equals(x)} should return
-     *     {@code true}.
+     *     {@code true}.自反性
      * <li>It is <i>symmetric</i>: for any non-null reference values
      *     {@code x} and {@code y}, {@code x.equals(y)}
      *     should return {@code true} if and only if
-     *     {@code y.equals(x)} returns {@code true}.
+     *     {@code y.equals(x)} returns {@code true}.对称性
      * <li>It is <i>transitive</i>: for any non-null reference values
      *     {@code x}, {@code y}, and {@code z}, if
      *     {@code x.equals(y)} returns {@code true} and
      *     {@code y.equals(z)} returns {@code true}, then
-     *     {@code x.equals(z)} should return {@code true}.
+     *     {@code x.equals(z)} should return {@code true}.传递性
      * <li>It is <i>consistent</i>: for any non-null reference values
      *     {@code x} and {@code y}, multiple invocations of
      *     {@code x.equals(y)} consistently return {@code true}
      *     or consistently return {@code false}, provided no
      *     information used in {@code equals} comparisons on the
-     *     objects is modified.
-     * <li>For any non-null reference value {@code x},
+     *     objects is modified.一致性
+     * <li>For any non-null reference value {@code x},传空值应返回false
      *     {@code x.equals(null)} should return {@code false}.
      * </ul>
      * <p>
+     * 默认是两个对象地址相等才返回true
      * The {@code equals} method for class {@code Object} implements
      * the most discriminating possible equivalence relation on objects;
      * that is, for any non-null reference values {@code x} and
@@ -134,6 +149,7 @@ public class Object {
      * if {@code x} and {@code y} refer to the same object
      * ({@code x == y} has the value {@code true}).
      * <p>
+     * 注意：通常来说，重写equals方法时有必要也重写hashCode方法，以便遵守hashCode同象同码的规则
      * Note that it is generally necessary to override the {@code hashCode}
      * method whenever this method is overridden, so as to maintain the
      * general contract for the {@code hashCode} method, which states
@@ -150,28 +166,38 @@ public class Object {
     }
 
     /**
+     * 创建并返回该对象的副本，"copy"的确切意思由对象自身决定，
+     * 通常来说它的形式应该是这样的
      * Creates and returns a copy of this object.  The precise meaning
      * of "copy" may depend on the class of the object. The general
      * intent is that, for any object {@code x}, the expression:
      * <blockquote>
      * <pre>
+     * 拷贝对象的引用和原来对象的引用一般不相等
      * x.clone() != x</pre></blockquote>
      * will be true, and that the expression:
      * <blockquote>
      * <pre>
+     * 字节码文件对象一般相等(不强制要求)
      * x.clone().getClass() == x.getClass()</pre></blockquote>
      * will be {@code true}, but these are not absolute requirements.
      * While it is typically the case that:
      * <blockquote>
      * <pre>
+     * 拷贝对象和原对象的equals比较一般相等(不强制要求)
      * x.clone().equals(x)</pre></blockquote>
      * will be {@code true}, this is not an absolute requirement.
      * <p>
+     * 按照传统，调用super.clone()来返回对象
+     * 如果除Object之外的子类遵守传统，那么就能达到字节码对象相等
      * By convention, the returned object should be obtained by calling
      * {@code super.clone}.  If a class and all of its superclasses (except
      * {@code Object}) obey this convention, it will be the case that
      * {@code x.clone().getClass() == x.getClass()}.
      * <p>
+     * 按惯例，拷贝返回的对象是独立的，为了达到这个条件，在返回对象之前有必要修改它的一些字段
+     * 典型来说，往往其可变成员也需要拷贝一份以替换之前的引用
+     * 如果只包含不可变领域不用改
      * By convention, the object returned by this method should be independent
      * of this object (which is being cloned).  To achieve this independence,
      * it may be necessary to modify one or more fields of the object returned
@@ -183,6 +209,9 @@ public class Object {
      * the case that no fields in the object returned by {@code super.clone}
      * need to be modified.
      * <p>
+     * 不继承Cloneable接口使用clone方法会抛出异常
+     * 所有数组默认已经实现了Cloneable接口
+     * 不拷贝其字段，则为浅拷贝
      * The method {@code clone} for class {@code Object} performs a
      * specific cloning operation. First, if the class of this object does
      * not implement the interface {@code Cloneable}, then a
@@ -196,6 +225,7 @@ public class Object {
      * contents of the fields are not themselves cloned. Thus, this method
      * performs a "shallow copy" of this object, not a "deep copy" operation.
      * <p>
+     * Object类没有实现Cloneable接口，所以它调用clone()会抛异常
      * The class {@code Object} does not itself implement the interface
      * {@code Cloneable}, so calling the {@code clone} method on an object
      * whose class is {@code Object} will result in throwing an
@@ -207,18 +237,24 @@ public class Object {
      *               that override the {@code clone} method can also
      *               throw this exception to indicate that an instance cannot
      *               be cloned.
+     *               子类对象重写父类clone方法，父类没有实现Cloneable，子类也会抛异常
      * @see java.lang.Cloneable
+     * protect修饰的方法：与基类不在同一个包中的子类，
+     * 只能访问自身从基类继承而来的受保护成员，而不能访问基类实例本身的受保护成员
      */
     protected native Object clone() throws CloneNotSupportedException;
 
     /**
+     * 以文本形式表示一个对象
      * Returns a string representation of the object. In general, the
      * {@code toString} method returns a string that
      * "textually represents" this object. The result should
      * be a concise but informative representation that is easy for a
      * person to read.
+     * 建议所有子类都应该重写这个方法
      * It is recommended that all subclasses override this method.
      * <p>
+     * 返回对象名@十六进制表示的hashCode
      * The {@code toString} method for class {@code Object}
      * returns a string consisting of the name of the class of which the
      * object is an instance, the at-sign character `{@code @}', and
@@ -236,13 +272,15 @@ public class Object {
         return getClass().getName() + "@" + Integer.toHexString(hashCode());
     }
 
-    /**
+    /**线程等待对象的监听器，有多个线程等待，唤醒一个线程是随机的
      * Wakes up a single thread that is waiting on this object's
      * monitor. If any threads are waiting on this object, one of them
      * is chosen to be awakened. The choice is arbitrary and occurs at
      * the discretion of the implementation. A thread waits on an object's
      * monitor by calling one of the {@code wait} methods.
      * <p>
+     * 被唤醒线程不能立即工作，直到当前线程释放该对象的锁，
+     * 等待notify的synchronized代码块执行完之后才会获得锁对象
      * The awakened thread will not be able to proceed until the current
      * thread relinquishes the lock on this object. The awakened thread will
      * compete in the usual manner with any other threads that might be
@@ -250,17 +288,22 @@ public class Object {
      * awakened thread enjoys no reliable privilege or disadvantage in being
      * the next thread to lock this object.
      * <p>
+     * 该方法只能被持有该对象监听器的线程调用，一个线程想持有一个对象的监听器有三种方式：
      * This method should only be called by a thread that is the owner
      * of this object's monitor. A thread becomes the owner of the
      * object's monitor in one of three ways:
      * <ul>
+     * 通过执行该对象实例的同步方法
      * <li>By executing a synchronized instance method of that object.
+     * 执行该对象的同步代码块
      * <li>By executing the body of a {@code synchronized} statement
      *     that synchronizes on the object.
+     * 对于类，通过执行同步静态方法
      * <li>For objects of type {@code Class,} by executing a
      *     synchronized static method of that class.
      * </ul>
      * <p>
+     * 同一时间只有一个线程可以持有一个对象的监听器
      * Only one thread at a time can own an object's monitor.
      *
      * @throws  IllegalMonitorStateException  if the current thread is not
@@ -270,7 +313,7 @@ public class Object {
      */
     public final native void notify();
 
-    /**
+    /**唤醒等待这个对象监听器的所有线程
      * Wakes up all threads that are waiting on this object's monitor. A
      * thread waits on an object's monitor by calling one of the
      * {@code wait} methods.
@@ -295,30 +338,38 @@ public class Object {
     public final native void notifyAll();
 
     /**
+     * 让当前线程等待，直到其他线程唤醒或者指定的时间已过
      * Causes the current thread to wait until either another thread invokes the
      * {@link java.lang.Object#notify()} method or the
      * {@link java.lang.Object#notifyAll()} method for this object, or a
      * specified amount of time has elapsed.
      * <p>
+     * 当前线程必须拥有这个对象的监听器
      * The current thread must own this object's monitor.
      * <p>
+     * wait状态会释放所有锁，线程持续休眠直到发生以下四种情况：
      * This method causes the current thread (call it <var>T</var>) to
      * place itself in the wait set for this object and then to relinquish
      * any and all synchronization claims on this object. Thread <var>T</var>
      * becomes disabled for thread scheduling purposes and lies dormant
      * until one of four things happens:
      * <ul>
+     * notify方法被调用
      * <li>Some other thread invokes the {@code notify} method for this
      * object and thread <var>T</var> happens to be arbitrarily chosen as
      * the thread to be awakened.
      * <li>Some other thread invokes the {@code notifyAll} method for this
      * object.
+     * 其他线程中断了线程T
      * <li>Some other thread {@linkplain Thread#interrupt() interrupts}
      * thread <var>T</var>.
+     * 设置的时间到期了，值为0则一直等直到notify唤醒
      * <li>The specified amount of real time has elapsed, more or less.  If
      * {@code timeout} is zero, however, then real time is not taken into
      * consideration and the thread simply waits until notified.
      * </ul>
+     * 线程从wait中醒来之后会进入就绪态，重新竞争同步权限，
+     * 一旦拿到了控制权，同步状态会与之前调用wait方法时一致
      * The thread <var>T</var> is then removed from the wait set for this
      * object and re-enabled for thread scheduling. It then competes in the
      * usual manner with other threads for the right to synchronize on the
@@ -331,6 +382,8 @@ public class Object {
      * thread {@code T} is exactly as it was when the {@code wait} method
      * was invoked.
      * <p>
+     * 除此之外，还有一种虚假唤醒的方式
+     * 我们需要循环+条件控制来避免
      * A thread can also wake up without being notified, interrupted, or
      * timing out, a so-called <i>spurious wakeup</i>.  While this will rarely
      * occur in practice, applications must guard against it by testing for
@@ -348,19 +401,21 @@ public class Object {
      * "Concurrent Programming in Java (Second Edition)" (Addison-Wesley,
      * 2000), or Item 50 in Joshua Bloch's "Effective Java Programming
      * Language Guide" (Addison-Wesley, 2001).
-     *
+     *调用wait方法后 被中断会抛InterruptedException异常
+     * 该异常不会立即抛出，直到锁回到上述
      * <p>If the current thread is {@linkplain java.lang.Thread#interrupt()
      * interrupted} by any thread before or while it is waiting, then an
      * {@code InterruptedException} is thrown.  This exception is not
      * thrown until the lock status of this object has been restored as
      * described above.
-     *
+     * 只会解锁调用wait方法的当前对象，其他对象仍然保持锁定
      * <p>
      * Note that the {@code wait} method, as it places the current thread
      * into the wait set for this object, unlocks only this object; any
      * other objects on which the current thread may be synchronized remain
      * locked while the thread waits.
      * <p>
+     * 该方法只能由持有该对象监听器的线程调用
      * This method should only be called by a thread that is the owner
      * of this object's monitor. See the {@code notify} method for a
      * description of the ways in which a thread can become the owner of
@@ -375,7 +430,7 @@ public class Object {
      *             current thread before or while the current thread
      *             was waiting for a notification.  The <i>interrupted
      *             status</i> of the current thread is cleared when
-     *             this exception is thrown.
+     *             this exception is thrown.抛出异常时，中断状态会被清除
      * @see        java.lang.Object#notify()
      * @see        java.lang.Object#notifyAll()
      */
@@ -387,7 +442,7 @@ public class Object {
      * {@link java.lang.Object#notifyAll()} method for this object, or
      * some other thread interrupts the current thread, or a certain
      * amount of real time has elapsed.
-     * <p>
+     * <p>此方法与上一个wait方法相似，但是提供了更好的等待时间控制
      * This method is similar to the {@code wait} method of one
      * argument, but it allows finer control over the amount of time to
      * wait for a notification before giving up. The amount of real time,
@@ -503,6 +558,7 @@ public class Object {
     }
 
     /**
+     * finalize()方法将在垃圾回收器清除对象之前调用，但该方法不知道何时调用，具有不定性
      * Called by the garbage collector on an object when garbage collection
      * determines that there are no more references to the object.
      * A subclass overrides the {@code finalize} method to dispose of
@@ -540,9 +596,13 @@ public class Object {
      * actions by other objects or classes which are ready to be finalized,
      * at which point the object may be discarded.
      * <p>
+     * 一个对象的finalize()方法只会被调用一次，而且finalize()被调用不意味着gc会立即回收该对象，
+     * 所以有可能调用finalize()后，该对象又不需要被回收了，然后到了真正要被回收的时候，
+     * 因为前面调用过一次，所以不会调用finalize()，产生问题
      * The {@code finalize} method is never invoked more than once by a Java
      * virtual machine for any given object.
      * <p>
+     * 该方法抛出的任何异常都会停止对象的终结
      * Any exception thrown by the {@code finalize} method causes
      * the finalization of this object to be halted, but is otherwise
      * ignored.
